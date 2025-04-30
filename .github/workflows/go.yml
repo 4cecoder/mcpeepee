@@ -1,0 +1,38 @@
+# .github/workflows/go.yml
+
+name: Go Build & Test
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # Or specify macOS if Fyne has issues on Linux CI
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.21" # Specify your Go version
+
+      - name: Install Fyne dependencies (Ubuntu)
+        # Fyne requires C libraries for building
+        # Add equivalent steps for macOS if using macos-latest runner
+        run: sudo apt-get update && sudo apt-get install -y libgl1-mesa-dev xorg-dev
+        if: runner.os == 'Linux'
+
+      # You might need similar steps for macOS if using macos-latest runner
+      # - name: Install Fyne dependencies (macOS)
+      #   run: brew install Mako # Example, check Fyne docs for exact macOS deps
+      #   if: runner.os == 'macOS'
+
+      - name: Build
+        run: go build -v ./
+
+    # Add tests later if needed
+    # - name: Test
+    #   run: go test -v ./
