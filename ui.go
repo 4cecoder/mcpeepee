@@ -338,7 +338,7 @@ func buildSmitheryTabUI() fyne.CanvasObject {
 		refreshSmitheryTab()
 	}
 
-	searchButton := widget.NewButton("Search", func() {
+	searchButton := widget.NewButtonWithIcon("Search", theme.SearchIcon(), func() {
 		log.Println("Smithery search button clicked")
 		refreshSmitheryTab()
 	})
@@ -354,9 +354,9 @@ func buildSmitheryTabUI() fyne.CanvasObject {
 		func() fyne.CanvasObject { // CreateItem template
 			nameLabel := widget.NewLabel("Server Name")
 			descLabel := widget.NewLabel("Description")
-			detailsButton := widget.NewButton("Details", nil)
+			detailsButton := widget.NewButtonWithIcon("", theme.InfoIcon(), nil) // Icon only, text set in UpdateItem
 			detailsButton.Importance = widget.LowImportance
-			addButton := widget.NewButton("Add to Config", nil)
+			addButton := widget.NewButtonWithIcon("", theme.ContentAddIcon(), nil) // Icon only, text set in UpdateItem
 			addButton.Importance = widget.LowImportance
 
 			textInfo := container.NewVBox(nameLabel, descLabel)
