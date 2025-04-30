@@ -772,7 +772,11 @@ func buildUI(a fyne.App) fyne.Window {
 
 	// --- Create Tabs ---
 	mcpManagerTab := container.NewTabItem("MCP Manager", mcpManagerContent)
+	mcpManagerTab.Icon = theme.ListIcon() // Set icon for the tab
+
 	smitheryTab := container.NewTabItem("Smithery", smitheryContent)
+	smitheryTab.Icon = theme.SearchIcon() // Set icon for the tab
+
 	appTabs := container.NewAppTabs(mcpManagerTab, smitheryTab)
 
 	w.SetContent(appTabs)
