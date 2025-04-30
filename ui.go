@@ -740,9 +740,31 @@ func buildUI(a fyne.App) fyne.Window {
 	})
 
 	mcpScrollContainer := container.NewVScroll(mcpList)
-	topButtons := container.NewGridWithColumns(5, addNewButton, openInCursorButton, openLogFolderButton, settingsButton, applyButton)
-	mcpBottomButtons := container.NewVBox(topButtons, restartClaudeButton)
-	mcpManagerContent := container.NewBorder(nil, mcpBottomButtons, nil, nil, mcpScrollContainer)
+
+	// --- Define layout sections for MCP Manager ---
+	// Top Toolbar: Core MCP actions + Settings
+	topToolbar := container.NewHBox(
+		addNewButton,
+		applyButton,
+		layout.NewSpacer(), // Pushes Settings to the right
+		settingsButton,
+	)
+
+	// Bottom Bar: Utility/external actions
+	bottomBar := container.NewHBox(
+		openInCursorButton,
+		openLogFolderButton,
+		restartClaudeButton,
+	)
+
+	// --- Use Border layout for the MCP Manager tab content ---
+	mcpManagerContent := container.NewBorder(
+		topToolbar,         // Top
+		bottomBar,          // Bottom
+		nil,                // Left
+		nil,                // Right
+		mcpScrollContainer, // Center - takes up the remaining space
+	)
 
 	// --- Build Smithery Tab ---
 	smitheryContent := buildSmitheryTabUI()
