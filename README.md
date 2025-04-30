@@ -1,6 +1,7 @@
 # MC PeePee - Claude MCP Manager
 
-[![Go Build Status](https://img.shields.io/github/actions/workflow/status/4cecoder/mcpeepee/go.yml?branch=main)](https://github.com/4cecoder/mcpeepee/actions/workflows/go.yml) [![Go Report Card](https://goreportcard.com/badge/github.com/4cecoder/mcpeepee)](https://goreportcard.com/report/github.com/4cecoder/mcpeepee)
+[![Go Build Status](https://img.shields.io/github/actions/workflow/status/4cecoder/mcpeepee/go.yml?branch=main)](https://github.com/4cecoder/mcpeepee/actions/workflows/go.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/4cecoder/mcpeepee)](https://goreportcard.com/report/github.com/4cecoder/mcpeepee)
 
 **Manage your Claude Desktop Model Compute Providers (MCPs) with ease!**
 
