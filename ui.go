@@ -15,6 +15,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 
 	// Assuming module path is mcpeepee or similar, adjust if necessary
@@ -692,7 +693,7 @@ func buildUI(a fyne.App) fyne.Window {
 	}
 
 	// MCP Manager Buttons...
-	applyButton := widget.NewButton("Apply to Claude", func() {
+	applyButton := widget.NewButtonWithIcon("Apply to Claude", theme.ConfirmIcon(), func() {
 		log.Println("Apply button clicked")
 		if err := writeClaudeConfig(); err != nil { // Uses func from config.go
 			log.Printf("ERROR applying changes to Claude config: %v", err)
@@ -702,8 +703,8 @@ func buildUI(a fyne.App) fyne.Window {
 			dialog.ShowInformation("Success", "Configuration applied to Claude.", w)
 		}
 	})
-	addNewButton := widget.NewButton("Add New MCP", func() { showAddMCPDialog(w) })
-	openInCursorButton := widget.NewButton("Open Config", func() {
+	addNewButton := widget.NewButtonWithIcon("Add New MCP", theme.ContentAddIcon(), func() { showAddMCPDialog(w) })
+	openInCursorButton := widget.NewButtonWithIcon("Open Config", theme.DocumentIcon(), func() {
 		go func() {
 			cmd := exec.Command("cursor", claudeConfigPath) // Uses var from config.go
 			if err := cmd.Start(); err != nil {
@@ -712,7 +713,7 @@ func buildUI(a fyne.App) fyne.Window {
 			}
 		}()
 	})
-	openLogFolderButton := widget.NewButton("Open Logs", func() {
+	openLogFolderButton := widget.NewButtonWithIcon("Open Logs", theme.FolderOpenIcon(), func() {
 		logPath, err := getClaudeLogPath() // Uses func from config.go
 		if err != nil {
 			dialog.ShowError(fmt.Errorf("Could not determine log path: %w", err), w)
@@ -726,7 +727,7 @@ func buildUI(a fyne.App) fyne.Window {
 			}
 		}()
 	})
-	restartClaudeButton := widget.NewButton("Restart Claude", func() {
+	restartClaudeButton := widget.NewButtonWithIcon("Restart Claude", theme.ViewRefreshIcon(), func() {
 		dialog.ShowConfirm("Confirm Restart", "Restart Claude Desktop?", func(confirm bool) {
 			if !confirm {
 				return
@@ -734,7 +735,7 @@ func buildUI(a fyne.App) fyne.Window {
 			go func() { /* ... restart logic ... */ }()
 		}, w)
 	})
-	settingsButton := widget.NewButton("Settings", func() {
+	settingsButton := widget.NewButtonWithIcon("Settings", theme.SettingsIcon(), func() {
 		log.Println("Settings button clicked")
 		showSettingsDialog(w)
 	})
