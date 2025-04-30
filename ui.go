@@ -622,6 +622,35 @@ func showAddSmitheryMCPDialog(parentWindow fyne.Window, server smithery.Server) 
 		}
 
 		log.Printf("Successfully added Smithery MCP: %s", mcpName)
+
+		// --- Execute the smithery run command in the background ---
+		go func(cmdName string, cmdArgs []string) {
+			log.Printf("Attempting to run command: %s %v", cmdName, cmdArgs)
+			// TODO: Add API Key to args if it's set in settings
+			// apiKey, _ := getSetting("SmitheryAPIKey")
+			// if apiKey != "" {
+			// 	 cmdArgs = append(cmdArgs, "--key", apiKey)
+			// }
+
+			execCmd := exec.Command(cmdName, cmdArgs...)
+			output, err := execCmd.CombinedOutput() // Run and wait, capture output
+			if err != nil {
+				log.Printf("ERROR running smithery command for '%s': %v\nOutput:\n%s", mcpName, err, string(output))
+				// Optional: Show error to user via dialog on main thread
+				fyne.Do(func() {
+					dialog.ShowError(fmt.Errorf("failed to run smithery setup for %s: %v", mcpName, err), parentWindow)
+				})
+			} else {
+				log.Printf("Successfully ran smithery command for '%s'. Output:\n%s", mcpName, string(output))
+				// Optional: Show success info
+				fyne.Do(func() {
+					dialog.ShowInformation("Setup Started", fmt.Sprintf("Smithery setup command for '%s' started.", mcpName), parentWindow)
+				})
+			}
+		}(command, args) // Pass command and args to goroutine
+		// ----------------------------------------------------------
+
+		// Show information about adding to config (existing message)
 		dialog.ShowInformation("Success", fmt.Sprintf("MCP '%s' added. Apply changes to update Claude.", mcpName), parentWindow)
 
 		// Refresh the MCP manager list immediately
