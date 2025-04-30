@@ -406,33 +406,38 @@ func buildSmitheryTabUI() fyne.CanvasObject {
 				loading := dialog.NewProgressInfinite("Fetching Details", "Fetching details for "+server.QualifiedName+"...", fyne.CurrentApp().Driver().AllWindows()[0])
 				loading.Show()
 
-				go func(qName string) {
+				go func(qName string, currentServer smithery.Server) { // Pass server copy
 					detail, fetchErr := smithery.FetchServerDetail(apiKey, qName)
-					loading.Hide()
 
-					if fetchErr != nil {
-						log.Printf("ERROR fetching server detail for %s: %v", qName, fetchErr)
-						dialog.ShowError(fmt.Errorf("Failed to fetch server details: %w", fetchErr), fyne.CurrentApp().Driver().AllWindows()[0])
-						return
-					}
+					// --- Schedule UI updates back on the main thread ---
+					fyne.Do(func() {
+						loading.Hide()
 
-					if detail != nil {
-						// Pass both the original server (for description) and the detail
-						detailViewContent := buildServerDetailView(server, *detail) // Get content
-						// Create and show a modal dialog
-						detailDialog := dialog.NewCustom(
-							server.DisplayName, // Title
-							"Close",            // Dismiss button text
-							detailViewContent,  // Content
-							fyne.CurrentApp().Driver().AllWindows()[0], // Parent window
-						)
-						detailDialog.Resize(fyne.NewSize(500, 400)) // Adjust size as needed
-						detailDialog.Show()
-					} else {
-						log.Printf("WARN: Fetched server detail was nil for %s", qName)
-						// Handle case where detail is nil even without error (shouldn't happen ideally)
-					}
-				}(server.QualifiedName) // Pass qualified name to goroutine
+						if fetchErr != nil {
+							log.Printf("ERROR fetching server detail for %s: %v", qName, fetchErr)
+							dialog.ShowError(fmt.Errorf("Failed to fetch server details: %w", fetchErr), fyne.CurrentApp().Driver().AllWindows()[0])
+							return
+						}
+
+						if detail != nil {
+							// Pass both the original server (for description) and the detail
+							detailViewContent := buildServerDetailView(currentServer, *detail) // Use passed server copy
+							// Create and show a modal dialog
+							detailDialog := dialog.NewCustom(
+								currentServer.DisplayName, // Title
+								"Close",                   // Dismiss button text
+								detailViewContent,         // Content
+								fyne.CurrentApp().Driver().AllWindows()[0], // Parent window
+							)
+							detailDialog.Resize(fyne.NewSize(500, 400)) // Adjust size as needed
+							detailDialog.Show()
+						} else {
+							log.Printf("WARN: Fetched server detail was nil for %s", qName)
+							// Handle case where detail is nil even without error (shouldn't happen ideally)
+							dialog.ShowInformation("Not Found", "Could not retrieve details for "+qName, fyne.CurrentApp().Driver().AllWindows()[0])
+						}
+					})
+				}(server.QualifiedName, server) // Pass qualified name and server copy to goroutine
 
 			}
 			addButton.OnTapped = func() {
