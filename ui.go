@@ -590,8 +590,9 @@ func showAddSmitheryMCPDialog(parentWindow fyne.Window, server smithery.Server) 
 	args := []string{
 		"-y",
 		"@smithery/cli@latest",
-		"run",
-		server.QualifiedName, // The server to run
+		"install",
+		server.QualifiedName,
+		"--client", "claude",
 	}
 
 	// --- Conditionally add API Key ---
