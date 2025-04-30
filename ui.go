@@ -585,15 +585,28 @@ func buildServerDetailView(server smithery.Server, serverDetail smithery.ServerD
 func showAddSmitheryMCPDialog(parentWindow fyne.Window, server smithery.Server) {
 	mcpName := server.QualifiedName
 	command := "npx"
+
+	// Base arguments
 	args := []string{
 		"-y",
 		"@smithery/cli@latest",
 		"run",
 		server.QualifiedName, // The server to run
-		// We will add --key later when writing the final config based on settings
 	}
 
-	argsJSONBytes, _ := json.Marshal(args)
+	// --- Conditionally add API Key ---
+	apiKey, err := getSetting("SmitheryAPIKey")
+	if err != nil {
+		log.Printf("WARN: Could not retrieve SmitheryAPIKey setting when preparing command for %s: %v", mcpName, err)
+		// Decide if we should proceed without the key or show an error.
+		// For now, we proceed, but the command might fail if the key is required.
+	} else if apiKey != "" {
+		log.Printf("Adding API key to command args for %s", mcpName)
+		args = append(args, "--key", apiKey)
+	}
+	// ---------------------------------
+
+	argsJSONBytes, _ := json.Marshal(args) // Marshal the potentially updated args
 	argsJSONString := string(argsJSONBytes)
 
 	message := fmt.Sprintf("Add MCP '%s'?\nCommand: %s\nArgs: %s\n(API key will be added automatically if set in Settings)",
@@ -624,13 +637,10 @@ func showAddSmitheryMCPDialog(parentWindow fyne.Window, server smithery.Server) 
 		log.Printf("Successfully added Smithery MCP: %s", mcpName)
 
 		// --- Execute the smithery run command in the background ---
+		// Pass the final 'args' slice (which might include the API key)
 		go func(cmdName string, cmdArgs []string) {
 			log.Printf("Attempting to run command: %s %v", cmdName, cmdArgs)
-			// TODO: Add API Key to args if it's set in settings
-			// apiKey, _ := getSetting("SmitheryAPIKey")
-			// if apiKey != "" {
-			// 	 cmdArgs = append(cmdArgs, "--key", apiKey)
-			// }
+			// No need to add key here again, it's already in cmdArgs if needed
 
 			execCmd := exec.Command(cmdName, cmdArgs...)
 			output, err := execCmd.CombinedOutput() // Run and wait, capture output
